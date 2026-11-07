@@ -1,0 +1,17 @@
+// AlsamOS HOSTED policy module; not yet executed inside the bare-metal kernel.
+// 0 = ready, 10 = RAM insufficient, 20 = storage unavailable.
+fn boot_policy(memory_mib: Int, storage_ready: Bool) -> Int {
+    if memory_mib < 64 {
+        return 10
+    }
+    if !storage_ready {
+        return 20
+    }
+    return 0
+}
+
+fn main() -> Unit {
+    println(boot_policy(128, true))
+    println(boot_policy(32, true))
+    println(boot_policy(128, false))
+}

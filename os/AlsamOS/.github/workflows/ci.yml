@@ -1,0 +1,29 @@
+name: AlsamOS pre-alpha CI
+on:
+  push:
+  pull_request:
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and verify kernel structural invariants
+        working-directory: os/AlsamOS
+        run: make test
+      - name: QEMU boot and serial console smoke
+        working-directory: os/AlsamOS
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends qemu-system-x86
+          make test-emulator
+      - name: Checkout Samhus compiler (experimental, founder's repo)
+        uses: actions/checkout@v4
+        with:
+          repository: SamandarAlimov/samhus
+          path: samhus-compiler
+          persist-credentials: false
+      - name: Samhus VM/native hosted policy check
+        working-directory: os/AlsamOS
+        run: |
+          python -m pip install -e ../../samhus-compiler
+          python tools/test_samhus.py
